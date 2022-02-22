@@ -1,6 +1,6 @@
 from sklearn.base import BaseEstimator, TransformerMixin
 from TaxiFareModel.utils import haversine_vectorized
-
+import pandas as pd
 class TimeFeaturesEncoder(BaseEstimator, TransformerMixin):
     """
         Extracts the day of week (dow), the hour, the month and the year from a time column.
