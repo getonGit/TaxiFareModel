@@ -1,2 +1,2 @@
-#web: pip install . -U && TaxiFareModel-run
-web: pip install . -U && streamlit run app.py
+web: pip install . -U && TaxiFareModel-run
+#web: pip install . -U && streamlit run app.py

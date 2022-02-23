@@ -1,13 +1,16 @@
 import pandas as pd
+import TaxiFareModel.params
 
 AWS_BUCKET_PATH = "s3://wagon-public-datasets/taxi-fare-train.csv"
 
 
-def get_data(nrows=10_000):
+def get_data():
     '''returns a DataFrame with nrows from s3 bucket'''
-    df = pd.read_csv(AWS_BUCKET_PATH, nrows=nrows)
+    #df = pd.read_csv(AWS_BUCKET_PATH, nrows=nrows)
+    #return df
+    """method to get the training data (or a portion of it) from google cloud bucket"""
+    df = pd.read_csv(f"gs://{BUCKET_NAME}/{BUCKET_TRAIN_DATA_PATH}", nrows=1000)
     return df
-
 
 def clean_data(df, test=False):
     df = df.dropna(how='any', axis='rows')
