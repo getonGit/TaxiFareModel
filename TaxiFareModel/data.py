@@ -1,8 +1,9 @@
 import pandas as pd
-import TaxiFareModel.params
+
 
 AWS_BUCKET_PATH = "s3://wagon-public-datasets/taxi-fare-train.csv"
-
+BUCKET_NAME = 'wagon-data-814-reddy'
+BUCKET_TRAIN_DATA_PATH = 'data/train_1k.csv'
 
 def get_data():
     '''returns a DataFrame with nrows from s3 bucket'''

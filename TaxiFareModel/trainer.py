@@ -9,7 +9,7 @@ from TaxiFareModel.encoders import DistanceTransformer, TimeFeaturesEncoder
 from TaxiFareModel.utils import compute_rmse
 from TaxiFareModel.data import get_data, clean_data
 import joblib
-import TaxiFareModel.params
+
 
 #GCP related variables
 BUCKET_NAME = 'wagon-data-814-reddy'
@@ -60,7 +60,7 @@ class Trainer():
 
     def evaluate(self, X_test, y_test):
         """evaluates the pipeline on df_test and return the RMSE"""
-        y_pred = self.pipeline.predict(X_test)
+        y_pred = self.model.predict(X_test)
         rmse = compute_rmse(y_pred, y_test)
         print(rmse)
         return rmse
@@ -68,28 +68,40 @@ class Trainer():
     STORAGE_LOCATION = 'models/TaxiFareModel/model.joblib'
 
 
-    def upload_model_to_gcp():
+    def upload_model_to_gcp(self):
 
         client = storage.Client()
 
         bucket = client.bucket(BUCKET_NAME)
 
-        blob = bucket.blob(STORAGE_LOCATION)
+        blob = bucket.blob('models/TaxiFareModel/model.joblib')
 
         blob.upload_from_filename('model.joblib')
 
+    def load_model_from_gcp(self):
 
-    def save_model(reg):
+        client = storage.Client()
+
+        bucket = client.bucket(BUCKET_NAME)
+
+        blob = bucket.blob('models/TaxiFareModel/model.joblib')
+
+        blob.download_to_filename('trained_model.joblib')
+        self.model = joblib.load('trained_model.joblib')
+        #return self.model
+
+    def save_model(self):
         """method that saves the model into a .joblib file and uploads it on Google Storage /models folder
         HINTS : use joblib library and google-cloud-storage"""
 
         # saving the trained model to disk is mandatory to then beeing able to upload it to storage
         # Implement here
-        joblib.dump(reg, 'model.joblib')
+        joblib.dump(self.pipeline, 'model.joblib')
         print("saved model.joblib locally")
 
         # Implement here
-        upload_model_to_gcp()
+        self.upload_model_to_gcp()
+        STORAGE_LOCATION = 'models/TaxiFareModel/model.joblib'
         print(f"uploaded model.joblib to gcp cloud storage under \n => {STORAGE_LOCATION}")
 
 
@@ -103,8 +115,11 @@ if __name__ == "__main__":
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
     trainer = Trainer(X_train, y_train)
-    reg = trainer.run(X_train, y_train)
-    upload_model_to_gcp()
-    save_model(reg)
+    trainer.run(X_train, y_train)
+
+    trainer.upload_model_to_gcp()
+    trainer.save_model()
     #rmse = trainer.evaluate(X_test, y_test)
     #print(f"rmse: {rmse}")
+    trainer.load_model_from_gcp()
+    trainer.evaluate(X_test, y_test)
